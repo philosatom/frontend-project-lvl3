@@ -3,3 +3,6 @@ install:
 
 lint:
 	npx eslint .
+
+deploy:
+  npx vercel
