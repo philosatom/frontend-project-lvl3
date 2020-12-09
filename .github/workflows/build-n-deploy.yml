@@ -17,8 +17,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: npm install
-        run: make install
+      - name: install & build
+        run: |
+          make install
+          make build
         env:
           CI: true
       - name: Run linter
@@ -30,6 +32,8 @@ jobs:
     steps:
       - name: Checkout ${{ github.repository }}
         uses: actions/checkout@v2
+      - name: List directory content
+        run: ls -la
       - name: Deploy via Vercel
         uses: amondnet/vercel-action@v20
         with:
@@ -37,3 +41,4 @@ jobs:
           vercel-args: '--prod'
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./dist
