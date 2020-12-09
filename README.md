@@ -12,4 +12,4 @@ This repository is created for educational purposes.
 $ make install
 ```
 
-### :globe_with_meridians: [Website](frontend-project-lvl3.philosatom.vercel.app)
+### :globe_with_meridians: [Website](https://frontend-project-lvl3.philosatom.vercel.app)
