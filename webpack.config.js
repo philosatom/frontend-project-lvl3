@@ -5,10 +5,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
-  context: path.resolve(__dirname, 'src'),
+  context: path.join(__dirname, 'src'),
+  entry: './index.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+  },
   plugins: [
     new HTMLWebpackPlugin({
-      template: 'template.html',
+      template: './template.html',
     }),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin(),

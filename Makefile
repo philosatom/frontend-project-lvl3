@@ -5,7 +5,7 @@ lint:
 	npx eslint .
 
 develop:
-	npx webpack-dev-server
+	npx webpack serve
 
 build:
 	npm run build
