@@ -1,6 +1,7 @@
 env:
   browser: true
-  es6: true
+  es2021: true
+  jest: true
 
 extends:
   - airbnb-base
@@ -8,9 +9,6 @@ extends:
 
 plugins:
   - jest
-
-parserOptions:
-  ecmaVersion: 2020
 
 rules:
   no-console: 0
