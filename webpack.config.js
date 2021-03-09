@@ -1,7 +1,7 @@
-const HTMLWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+import HTMLWebpackPlugin from 'html-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
-module.exports = {
+export default {
   mode: process.env.NODE_ENV || 'development',
   plugins: [
     new HTMLWebpackPlugin({
