@@ -14,7 +14,8 @@ develop:
 	npx webpack serve
 
 build:
-	npm run build
+	rm -rf dist
+	NODE_ENV=production npx webpack
 
 deploy:
 	npx vercel

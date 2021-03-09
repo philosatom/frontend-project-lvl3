@@ -4,10 +4,8 @@
   "description": "RSS agregator",
   "main": "index.js",
   "scripts": {
-    "build": "rm -rf dist && NODE_ENV=production webpack",
     "test": "npx -n --experimental-vm-modules jest"
   },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/philosatom/frontend-project-lvl3.git"
