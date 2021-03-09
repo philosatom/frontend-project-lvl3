@@ -23,9 +23,16 @@
   },
   "homepage": "https://github.com/philosatom/frontend-project-lvl3#readme",
   "devDependencies": {
+    "@babel/core": "^7.13.10",
+    "@babel/eslint-parser": "^7.13.10",
+    "@babel/eslint-plugin": "^7.13.10",
+    "@babel/preset-env": "^7.13.10",
     "@testing-library/dom": "^7.29.6",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/user-event": "^12.8.0",
+    "babel-jest": "^26.6.3",
+    "babel-loader": "^8.2.2",
+    "browserslist": "^4.16.3",
     "css-loader": "^5.0.1",
     "eslint": "^7.15.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -46,5 +53,8 @@
   "jest": {
     "testEnvironment": "jsdom",
     "transform": {}
-  }
+  },
+  "browserslist": [
+    "current node"
+  ]
 }

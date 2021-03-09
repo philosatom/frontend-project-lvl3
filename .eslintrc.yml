@@ -9,6 +9,13 @@ extends:
 
 plugins:
   - jest
+  - '@babel'
+
+parser:
+  '@babel/eslint-parser'
+
+parserOptions:
+  ecmaVersion: 12
 
 rules:
   no-console: 0
