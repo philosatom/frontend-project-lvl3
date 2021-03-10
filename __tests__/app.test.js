@@ -7,7 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import run from '../src/app.js';
 
-const { screen, waitFor } = testingLibrary;
+const { screen, getAllByRole, waitFor } = testingLibrary;
 const userEvent = testingLibraryUserEvent.default;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,19 +18,17 @@ const getFixturePath = (filename) => (
 
 const pathToHTMLFixture = getFixturePath('index.html');
 const initHTML = fs.readFileSync(pathToHTMLFixture, 'utf-8');
-const pathToRSSFixture = getFixturePath('rss.txt');
-const rss = fs.readFileSync(pathToRSSFixture, 'utf-8');
 
 const routes = {
   host: 'https://hexlet-allorigins.herokuapp.com',
   invalidURLPath: 'invalid-url',
-  invalidRSSPath: 'https://html-resource.com',
-  validPath: 'https://rss-resource.com',
+  nonRSSPath: 'https://google.com',
+  validPath: 'https://ru.hexlet.io/lessons.rss',
 };
 
 const messages = {
   invalidURL: 'The link must be a valid URL',
-  invalidRSS: 'Resource does not contain a valid RSS',
+  nonRSS: 'Resource does not contain a valid RSS',
   success: 'RSS was loaded successfully',
   nonuniqueURL: 'RSS already exists',
 };
@@ -38,60 +36,66 @@ const messages = {
 nock.disableNetConnect();
 let elements;
 
-describe('RSS loader', () => {
-  beforeAll(() => {
-    document.body.innerHTML = initHTML;
-    run();
+beforeEach(() => {
+  document.body.innerHTML = initHTML;
+  run();
 
-    elements = {
-      urlInput: screen.getByRole('textbox', { name: /url/i }),
-      addButton: screen.getByText(/Add/),
-      feedback: screen.getByTestId('feedback'),
-      feedsContainer: screen.getByTestId('feeds'),
-      postsContainer: screen.getByTestId('posts'),
-    };
-  });
+  elements = {
+    urlInput: screen.getByRole('textbox', { name: /url/i }),
+    addButton: screen.getByText(/Add/),
+    feedback: screen.getByTestId('feedback'),
+    feedsContainer: screen.getByTestId('feeds'),
+    postsContainer: screen.getByTestId('posts'),
+  };
+});
 
-  test('Does not pass validation if an invalid URL is typed', () => {
-    userEvent.type(elements.urlInput, routes.invalidURLPath);
-    userEvent.click(elements.addButton);
+test('Working process', () => {
+  userEvent.type(elements.urlInput, routes.invalidURLPath);
+  userEvent.click(elements.addButton);
 
-    return waitFor(() => {
-      expect(elements.feedback).toHaveTextContent(messages.invalidURL);
-    });
-  });
-
-  test('Does not load a new RSS feed if a valid non-RSS resource URL is typed', () => {
+  return waitFor(() => {
+    expect(elements.feedback).toHaveTextContent(messages.invalidURL);
+  }).then(() => {
     nock(routes.host)
-      .get((uri) => uri.includes(encodeURIComponent(routes.invalidRSSPath)))
+      .get((uri) => uri.includes(encodeURIComponent(routes.nonRSSPath)))
       .reply(200, {
         status: { content_type: 'text/html; charset=utf-8' },
       });
 
+    userEvent.clear(elements.urlInput);
     userEvent.type(elements.urlInput, routes.invalidRSSPath);
     userEvent.click(elements.addButton);
 
     return waitFor(() => {
-      expect(elements.feedback).toHaveTextContent(messages.invalidRSS);
+      expect(elements.feedback).toHaveTextContent(messages.nonRSS);
     });
-  });
+  }).then(() => {
+    const pathToRSSFixture = getFixturePath('rss.txt');
 
-  test('Loads a new RSS feed if a valid RSS resource URL is typed', () => {
     nock(routes.host)
       .get((uri) => uri.includes(encodeURIComponent(routes.validPath)))
-      .reply(200, { contents: rss });
+      .reply(200, {
+        contents: fs.readFileSync(pathToRSSFixture, 'utf-8'),
+        status: { content_type: 'application/rss+xml; charset=utf-8' },
+      });
 
+    userEvent.clear(elements.urlInput);
     userEvent.type(elements.urlInput, routes.validPath);
     userEvent.click(elements.addButton);
 
     return waitFor(() => {
-      expect(elements.feedback).toHaveTextContent(messages.success);
-      expect(elements.feedsContainer).not.toBeEmptyDOMElement();
-      expect(elements.postsContainer).not.toBeEmptyDOMElement();
-    });
-  });
+      const actualfeedTitles = getAllByRole(elements.feedsContainer, 'heading', { level: 3 })
+        .map((element) => element.textContent);
+      const expectedFeedTitles = ['Новые уроки на Хекслете'];
+      const actualPostTitles = getAllByRole(elements.postsContainer, 'link')
+        .map((element) => element.textContent);
+      const expectedPostTitles = ['Урок 2', 'Урок 1'];
 
-  test('Does not pass validation if a non-unique RSS resource URL is typed', () => {
+      expect(elements.feedback).toHaveTextContent(messages.success);
+      expect(actualfeedTitles).toEqual(expectedFeedTitles);
+      expect(actualPostTitles).toEqual(expectedPostTitles);
+    });
+  }).then(() => {
     userEvent.type(elements.urlInput, routes.validPath);
     userEvent.click(elements.addButton);
 
