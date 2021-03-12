@@ -1,16 +1,10 @@
 import '@testing-library/jest-dom';
-import testingLibrary from '@testing-library/dom';
-import testingLibraryUserEvent from '@testing-library/user-event';
+import { screen, getAllByRole, waitFor } from '@testing-library/dom';
+import userEvent from '@testing-library/user-event';
 import nock from 'nock';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import run from '../src/app.js';
-
-const { screen, getAllByRole, waitFor } = testingLibrary;
-const userEvent = testingLibraryUserEvent.default;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const getFixturePath = (filename) => (
   path.join(__dirname, '..', '__fixtures__', filename)

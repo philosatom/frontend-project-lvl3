@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "RSS agregator",
   "main": "index.js",
-  "scripts": {
-    "test": "npx -n --experimental-vm-modules jest"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/philosatom/frontend-project-lvl3.git"
@@ -49,8 +46,7 @@
     "bootstrap": "^4.5.3"
   },
   "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {}
+    "testEnvironment": "jsdom"
   },
   "browserslist": [
     "current node"
