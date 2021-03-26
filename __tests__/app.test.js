@@ -64,7 +64,7 @@ test('Working process', () => {
       expect(elements.feedback).toHaveTextContent(messages.nonRSS);
     });
   }).then(() => {
-    const pathToRSSFixture = getFixturePath('rss.txt');
+    const pathToRSSFixture = getFixturePath('rss.xml');
 
     nock(routes.host)
       .get((uri) => uri.includes(encodeURIComponent(routes.validPath)))
