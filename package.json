@@ -43,7 +43,12 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "bootstrap": "^4.5.3"
+    "axios": "^0.21.1",
+    "bootstrap": "^4.5.3",
+    "core-js": "^3.9.1",
+    "i18next": "^20.1.0",
+    "regenerator-runtime": "^0.13.7",
+    "yup": "^0.32.9"
   },
   "jest": {
     "testEnvironment": "jsdom"

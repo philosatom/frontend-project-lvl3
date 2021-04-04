@@ -14,7 +14,7 @@ const pathToHTMLFixture = getFixturePath('index.html');
 const initHTML = fs.readFileSync(pathToHTMLFixture, 'utf-8');
 
 const routes = {
-  host: 'https://hexlet-allorigins.herokuapp.com',
+  origin: 'https://hexlet-allorigins.herokuapp.com',
   invalidURLPath: 'invalid-url',
   nonRSSPath: 'https://google.com',
   validPath: 'https://ru.hexlet.io/lessons.rss',
@@ -50,7 +50,7 @@ test('Working process', () => {
   return waitFor(() => {
     expect(elements.feedback).toHaveTextContent(messages.invalidURL);
   }).then(() => {
-    nock(routes.host)
+    nock(routes.origin)
       .get((uri) => uri.includes(encodeURIComponent(routes.nonRSSPath)))
       .reply(200, {
         status: { content_type: 'text/html; charset=utf-8' },
@@ -66,7 +66,7 @@ test('Working process', () => {
   }).then(() => {
     const pathToRSSFixture = getFixturePath('rss.xml');
 
-    nock(routes.host)
+    nock(routes.origin)
       .get((uri) => uri.includes(encodeURIComponent(routes.validPath)))
       .reply(200, {
         contents: fs.readFileSync(pathToRSSFixture, 'utf-8'),
