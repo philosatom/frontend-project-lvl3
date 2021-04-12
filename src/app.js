@@ -20,6 +20,25 @@ const routes = {
 
 const schema = yup.string().url().uniqueness();
 
+const toObject = (data) => data.reduce((acc, { tagName, textContent }) => (
+  { ...acc, [tagName]: textContent }
+), {});
+
+const parseRSS = (rss) => {
+  const parser = new DOMParser();
+  const xmlDocument = parser.parseFromString(rss, 'text/xml');
+  const channel = xmlDocument.querySelector('channel');
+
+  const [itemElements, feedDataElements] = _.partition(
+    [...channel.children],
+    ({ tagName }) => tagName === 'item',
+  );
+
+  const feedData = toObject(feedDataElements);
+  const items = itemElements.map(({ children }) => toObject([...children]));
+  return { ...feedData, items };
+};
+
 const handleInput = (field, { form }) => {
   form.state = FORM_STATES.filling;
   form.data = field.value;
@@ -49,7 +68,6 @@ const handleSubmit = (state) => {
     state.form.error = null;
 
     const { items, ...feedData } = parseRSS(data.contents);
-    // TODO: реализовать парсер (из rss в object)
     const feedId = _.uniqueId();
     const newFeed = { id: feedId, url, ...feedData };
     const newPosts = items.map((item) => ({ feedId, ...item }));
