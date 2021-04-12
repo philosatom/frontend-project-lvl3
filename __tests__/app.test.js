@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
 import { screen, getAllByRole, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
+import axios from 'axios';
+import httpAdapter from 'axios/lib/adapters/http';
 import nock from 'nock';
 import fs from 'fs';
 import path from 'path';
@@ -27,7 +29,9 @@ const messages = {
   nonuniqueURL: 'RSS already exists',
 };
 
+axios.defaults.adapter = httpAdapter;
 nock.disableNetConnect();
+
 let elements;
 
 beforeEach(() => {
@@ -57,7 +61,7 @@ test('Working process', () => {
       });
 
     userEvent.clear(elements.urlInput);
-    userEvent.type(elements.urlInput, routes.invalidRSSPath);
+    userEvent.type(elements.urlInput, routes.nonRSSPath);
     userEvent.click(elements.addButton);
 
     return waitFor(() => {

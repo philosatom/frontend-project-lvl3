@@ -17,7 +17,7 @@ export default (value, schema, state) => {
   try {
     schema.validateSync(value, { abortEarly: false, context: state });
     return null;
-  } catch ({ type }) {
+  } catch ({ inner: [{ type }] }) {
     return `form.messages.errors.validation.${type}`;
   }
 };

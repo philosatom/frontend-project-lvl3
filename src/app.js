@@ -3,8 +3,9 @@
 import axios from 'axios';
 import i18n from 'i18next';
 import _ from 'lodash';
-import resources from './locales';
 import getValidationError, { yup } from './validator.js';
+import resources from './locales';
+import initView from './view.js';
 
 const FORM_STATES = {
   filling: 'filling',
@@ -15,7 +16,7 @@ const FORM_STATES = {
 
 const routes = {
   origin: 'https://hexlet-allorigins.herokuapp.com',
-  getPath: '/get',
+  getPath: (url) => `/get?url=${encodeURIComponent(url)}`,
 };
 
 const schema = yup.string().url().uniqueness();
@@ -51,33 +52,34 @@ const handleSubmit = (state) => {
   state.form.error = getValidationError(url, schema, state);
   state.form.isValid = state.form.error === null;
 
-  if (!state.form.isValid) return;
-
-  axios.get(routes.getPath, {
-    baseURL: routes.origin,
-    params: { url },
-  }).then(({ data }) => {
-    if (!/rss/.test(data.status.content_type)) {
-      state.form.state = FORM_STATES.failed;
-      state.form.error = 'form.messages.errors.rss';
-      return;
-    }
-
-    state.form.state = FORM_STATES.processed;
-    state.form.data = '';
-    state.form.error = null;
-
-    const { items, ...feedData } = parseRSS(data.contents);
-    const feedId = _.uniqueId();
-    const newFeed = { id: feedId, url, ...feedData };
-    const newPosts = items.map((item) => ({ feedId, ...item }));
-
-    state.feeds.push(newFeed);
-    state.posts.push(...newPosts);
-  }).catch(() => {
+  if (!state.form.isValid) {
     state.form.state = FORM_STATES.failed;
-    state.form.error = 'form.messages.errors.network';
-  });
+    return;
+  }
+
+  axios.get(routes.getPath(url), { baseURL: routes.origin })
+    .then(({ data }) => {
+      if (!/rss/.test(data.status.content_type)) {
+        state.form.state = FORM_STATES.failed;
+        state.form.error = 'form.messages.errors.rss';
+        return;
+      }
+
+      state.form.state = FORM_STATES.processed;
+      state.form.data = '';
+
+      const { items, ...feedData } = parseRSS(data.contents);
+      const feedId = _.uniqueId();
+      const newFeed = { id: feedId, url, ...feedData };
+      const newPosts = items.map((item) => ({ feedId, ...item }));
+
+      state.feeds.push(newFeed);
+      state.posts.push(...newPosts);
+    })
+    .catch(() => {
+      state.form.state = FORM_STATES.failed;
+      state.form.error = 'form.messages.errors.network';
+    });
 };
 
 export default () => {
@@ -94,16 +96,24 @@ export default () => {
 
   const form = document.querySelector('.rss-form');
   const urlField = form.elements.url;
+  const submitButton = form.querySelector('button');
+  const feedbackElement = document.querySelector('.feedback');
+
+  const elements = {
+    form, urlField, submitButton, feedbackElement,
+  };
 
   i18n.init({ lng: 'en', resources })
     .then(() => {
+      const watchedState = initView(state, elements, i18n);
+
       urlField.addEventListener('input', () => {
-        handleInput(urlField, state);
+        handleInput(urlField, watchedState);
       });
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        handleSubmit(state);
+        handleSubmit(watchedState);
       });
     });
 };
