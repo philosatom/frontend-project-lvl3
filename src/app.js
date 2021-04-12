@@ -1,10 +1,10 @@
 /* eslint-disable no-param-reassign */
 
-import * as yup from 'yup';
 import axios from 'axios';
 import i18n from 'i18next';
 import _ from 'lodash';
 import resources from './locales';
+import getValidationError, { yup } from './validator.js';
 
 const FORM_STATES = {
   filling: 'filling',
@@ -18,10 +18,7 @@ const routes = {
   getPath: '/get',
 };
 
-const schema = yup.string().url();
-const getValidationError = (url, { feeds }) => null;
-
-// TODO: реализовать валидацию введённых данных в отдельном модуле
+const schema = yup.string().url().uniqueness();
 
 const handleInput = (field, { form }) => {
   form.state = FORM_STATES.filling;
@@ -32,7 +29,7 @@ const handleSubmit = (state) => {
   const url = state.form.data.trim();
 
   state.form.state = FORM_STATES.processing;
-  state.form.error = getValidationError(url, state);
+  state.form.error = getValidationError(url, schema, state);
   state.form.isValid = state.form.error === null;
 
   if (!state.form.isValid) return;
