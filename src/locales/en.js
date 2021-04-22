@@ -13,5 +13,7 @@ export default {
         success: 'RSS was loaded successfully',
       },
     },
+    feeds: 'Feeds',
+    posts: 'Posts',
   },
 };

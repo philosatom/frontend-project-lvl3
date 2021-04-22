@@ -57,10 +57,33 @@ const renderError = ({ current: error }, elements, i18n) => {
   }
 };
 
+const renderFeeds = ({ current: feeds }, elements, i18n) => {
+  const titleElement = document.createElement('h2');
+  titleElement.textContent = i18n.t('feeds');
+
+  const listElement = document.createElement('ul');
+  listElement.classList.add('list-group', 'mb-5');
+
+  const listItemElements = feeds.map((feed) => {
+    const listItemElement = document.createElement('li');
+    listItemElement.classList.add('list-group-item');
+    listItemElement.innerHTML = `
+      <h3>${feed.title}</h3>
+      <p>${feed.description}</p>
+    `;
+
+    return listItemElement;
+  });
+
+  listItemElements.forEach(listElement.prepend);
+  elements.feedsContainer.append(titleElement, listElement);
+};
+
 const renderersByPath = {
   'form.state': renderFormState,
   'form.isValid': renderValidity,
   'form.error': renderError,
+  feeds: renderFeeds,
 };
 
 export default (state, elements, i18n) => (

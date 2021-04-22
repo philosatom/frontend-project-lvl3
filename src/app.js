@@ -98,9 +98,18 @@ export default () => {
   const urlField = form.elements.url;
   const submitButton = form.querySelector('button');
   const feedbackElement = document.querySelector('.feedback');
+  const feedsContainer = document.querySelector('.feeds');
+  const postsContainer = document.querySelector('.posts');
+  const modalWindow = document.querySelector('.modal');
 
   const elements = {
-    form, urlField, submitButton, feedbackElement,
+    form,
+    urlField,
+    submitButton,
+    feedbackElement,
+    feedsContainer,
+    postsContainer,
+    modalWindow,
   };
 
   i18n.init({ lng: 'en', resources })
