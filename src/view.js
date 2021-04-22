@@ -75,7 +75,10 @@ const renderFeeds = ({ current: feeds }, elements, i18n) => {
     return listItemElement;
   });
 
-  listItemElements.forEach(listElement.prepend);
+  listItemElements.forEach((element) => {
+    listElement.prepend(element);
+  });
+
   elements.feedsContainer.append(titleElement, listElement);
 };
 
@@ -84,6 +87,8 @@ const renderersByPath = {
   'form.isValid': renderValidity,
   'form.error': renderError,
   feeds: renderFeeds,
+  // TODO: создать оставшиеся функции-рендеры
+  // posts: renderPosts,
 };
 
 export default (state, elements, i18n) => (
