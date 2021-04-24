@@ -71,10 +71,11 @@ const handleSubmit = (state) => {
       const { items, ...feedData } = parseRSS(data.contents);
       const feedId = _.uniqueId();
       const newFeed = { id: feedId, url, ...feedData };
-      const newPosts = items.map((item) => ({ feedId, ...item }));
+      const postId = _.uniqueId();
+      const newPosts = items.map((item) => ({ id: postId, feedId, ...item }));
 
       state.feeds.push(newFeed);
-      state.posts.push(...newPosts);
+      state.posts.unshift(...newPosts);
     })
     .catch(() => {
       state.form.state = FORM_STATES.failed;

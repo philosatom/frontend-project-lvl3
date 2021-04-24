@@ -15,5 +15,6 @@ export default {
     },
     feeds: 'Feeds',
     posts: 'Posts',
+    view: 'View',
   },
 };
