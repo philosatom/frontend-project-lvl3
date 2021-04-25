@@ -79,10 +79,7 @@ const renderFeeds = (feeds, { elements, i18n }) => {
     return feedElement;
   });
 
-  feedElements.forEach((element) => {
-    listElement.prepend(element);
-  });
-
+  listElement.append(...feedElements);
   elements.feedsContainer.append(sectionTitleElement, listElement);
 };
 

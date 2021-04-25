@@ -74,7 +74,7 @@ const handleSubmit = (state) => {
       const postId = _.uniqueId();
       const newPosts = items.map((item) => ({ id: postId, feedId, ...item }));
 
-      state.feeds.push(newFeed);
+      state.feeds.unshift(newFeed);
       state.posts.unshift(...newPosts);
     })
     .catch(() => {
