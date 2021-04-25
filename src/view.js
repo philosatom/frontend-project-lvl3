@@ -103,7 +103,7 @@ const renderPosts = (posts, { elements, i18n }) => {
     );
 
     const linkElement = document.createElement('a');
-    linkElement.classList.add('font-weight-normal');
+    linkElement.classList.add('font-weight-bold');
     linkElement.setAttribute('href', post.link);
     linkElement.setAttribute('data-id', post.id);
     linkElement.setAttribute('target', '_blank');
@@ -114,7 +114,7 @@ const renderPosts = (posts, { elements, i18n }) => {
     button.classList.add('btn', 'btn-primary', 'btn-sm');
     button.setAttribute('type', 'button');
     button.setAttribute('data-id', post.id);
-    button.setAttribute('modal');
+    button.setAttribute('data-toggle', 'modal');
     button.setAttribute('data-target', '#modal');
     button.textContent = i18n.t('view');
 
