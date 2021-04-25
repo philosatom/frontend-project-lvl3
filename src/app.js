@@ -46,6 +46,8 @@ const handleInput = (field, { form }) => {
 };
 
 const handleSubmit = (state) => {
+  state.form.error = null;
+
   const url = state.form.data.trim();
 
   state.form.state = FORM_STATES.processing;
@@ -59,7 +61,7 @@ const handleSubmit = (state) => {
 
   axios.get(routes.getPath(url), { baseURL: routes.origin })
     .then(({ data }) => {
-      if (!/rss/.test(data.status.content_type)) {
+      if (!/(rss|xml)/.test(data.status.content_type)) {
         state.form.state = FORM_STATES.failed;
         state.form.error = 'form.messages.errors.rss';
         return;
