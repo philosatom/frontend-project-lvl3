@@ -101,7 +101,7 @@ export default () => {
   const feedbackElement = document.querySelector('.feedback');
   const feedsContainer = document.querySelector('.feeds');
   const postsContainer = document.querySelector('.posts');
-  const modalWindow = document.querySelector('.modal');
+  const modalWindow = document.getElementById('modal');
 
   const elements = {
     form,
