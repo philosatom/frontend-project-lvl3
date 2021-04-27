@@ -124,17 +124,28 @@ const renderPosts = (posts, { elements, i18n }) => {
   elements.postsContainer.append(sectionTitleElement, listElement);
 };
 
+const renderModalWindow = (postId, { state, elements }) => {
+  const actualPost = state.posts.find((post) => post.id === postId);
+
+  elements.modalWindowTitle.textContent = actualPost.title;
+  elements.modalWindowBody.textContent = actualPost.description;
+  elements.modalWindowLink.setAttribute('href', actualPost.link);
+};
+
 const renderersByPath = {
   'form.state': renderFormState,
   'form.isValid': renderValidity,
   'form.error': renderError,
   feeds: renderFeeds,
   posts: renderPosts,
+  'modalWindow.postId': renderModalWindow,
 };
 
-export default (state, elements, i18n) => (
-  onChange(state, (path, value) => {
+export default (state, elements, i18n) => {
+  const watchedState = onChange(state, (path, value) => {
     const render = _.get(renderersByPath, path, _.noop);
-    render(value, { elements, i18n });
-  })
-);
+    render(value, { state: watchedState, elements, i18n });
+  });
+
+  return watchedState;
+};

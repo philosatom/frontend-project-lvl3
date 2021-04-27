@@ -73,8 +73,10 @@ const handleSubmit = (state) => {
       const { items, ...feedData } = parseRSS(data.contents);
       const feedId = _.uniqueId();
       const newFeed = { id: feedId, url, ...feedData };
-      const postId = _.uniqueId();
-      const newPosts = items.map((item) => ({ id: postId, feedId, ...item }));
+      const newPosts = items.map((item) => {
+        const postId = _.uniqueId();
+        return { id: postId, feedId, ...item };
+      });
 
       state.feeds.unshift(newFeed);
       state.posts.unshift(...newPosts);
@@ -95,6 +97,9 @@ export default () => {
     },
     feeds: [],
     posts: [],
+    modalWindow: {
+      postId: null,
+    },
   };
 
   const form = document.querySelector('.rss-form');
@@ -103,7 +108,9 @@ export default () => {
   const feedbackElement = document.querySelector('.feedback');
   const feedsContainer = document.querySelector('.feeds');
   const postsContainer = document.querySelector('.posts');
-  const modalWindow = document.getElementById('modal');
+  const modalWindowTitle = document.querySelector('.modal-title');
+  const modalWindowBody = document.querySelector('.modal-body');
+  const modalWindowLink = document.querySelector('a.full-article');
 
   const elements = {
     form,
@@ -112,7 +119,9 @@ export default () => {
     feedbackElement,
     feedsContainer,
     postsContainer,
-    modalWindow,
+    modalWindowTitle,
+    modalWindowBody,
+    modalWindowLink,
   };
 
   i18n.init({ lng: 'en', resources })
@@ -126,6 +135,12 @@ export default () => {
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         handleSubmit(watchedState);
+      });
+
+      postsContainer.addEventListener('click', ({ target }) => {
+        if (target.tagName === 'BUTTON') {
+          watchedState.modalWindow.postId = target.dataset.id;
+        }
       });
     });
 };
