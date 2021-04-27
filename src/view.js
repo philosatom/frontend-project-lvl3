@@ -58,6 +58,8 @@ const renderError = (error, { elements, i18n }) => {
 };
 
 const renderFeeds = (feeds, { elements, i18n }) => {
+  elements.feedsContainer.innerHTML = '';
+
   const sectionTitleElement = document.createElement('h2');
   sectionTitleElement.textContent = i18n.t('feeds');
 
@@ -84,6 +86,8 @@ const renderFeeds = (feeds, { elements, i18n }) => {
 };
 
 const renderPosts = (posts, { elements, i18n }) => {
+  elements.postsContainer.innerHTML = '';
+
   const sectionTitleElement = document.createElement('h2');
   sectionTitleElement.textContent = i18n.t('posts');
 
