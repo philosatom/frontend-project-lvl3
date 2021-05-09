@@ -104,6 +104,46 @@ test('Working process', () => {
       });
     })
     .then(() => {
+      const buttons = getAllByRole(elements.postsContainer, 'button');
+      const actualModalData = [];
+
+      buttons.forEach((button) => {
+        userEvent.click(button);
+
+        actualModalData.push({
+          title: elements.modalTitle.textContent,
+          description: elements.modalBody.textContent,
+          url: elements.modalLink.getAttribute('href'),
+        });
+
+        userEvent.click(elements.closeModalButton);
+      });
+
+      const readPostLinkELements = getAllByRole(elements.postsContainer, 'link');
+
+      const expectedModalData = [
+        {
+          title: 'Урок 2',
+          description: 'Цель урока 2',
+          url: 'https://ru.hexlet.io/courses/ruby-compound-data/lessons/points/theory_unit',
+        },
+        {
+          title: 'Урок 1',
+          description: 'Цель урока 1',
+          url: 'https://ru.hexlet.io/courses/css-content/lessons/overflow/theory_unit',
+        },
+      ];
+
+      return waitFor(() => {
+        readPostLinkELements.forEach((element) => {
+          expect(element).toHaveClass('font-weight-normal');
+          expect(element).not.toHaveClass('font-weight-bold');
+        });
+
+        expect(actualModalData).toEqual(expectedModalData);
+      });
+    })
+    .then(() => {
       const pathToRSSFixture = getFixturePath('rss2_0.xml');
 
       nock(routes.origin)
@@ -130,44 +170,6 @@ test('Working process', () => {
       });
     })
     .then(() => {
-      const buttons = getAllByRole(elements.postsContainer, 'button');
-      const actualModalData = [];
-
-      buttons.forEach((button) => {
-        userEvent.click(button);
-
-        actualModalData.push({
-          title: elements.modalTitle.textContent,
-          description: elements.modalBody.textContent,
-          url: elements.modalLink.getAttribute('href'),
-        });
-
-        userEvent.click(elements.closeModalButton);
-      });
-
-      const expectedModalData = [
-        {
-          title: 'Blog post 1',
-          description: '',
-          url: 'http://ishadeed.com/article/inspect-element-curiosity/',
-        },
-        {
-          title: 'Урок 2',
-          description: 'Цель урока 2',
-          url: 'https://ru.hexlet.io/courses/ruby-compound-data/lessons/points/theory_unit',
-        },
-        {
-          title: 'Урок 1',
-          description: 'Цель урока 1',
-          url: 'https://ru.hexlet.io/courses/css-content/lessons/overflow/theory_unit',
-        },
-      ];
-
-      return waitFor(() => {
-        expect(actualModalData).toEqual(expectedModalData);
-      });
-    })
-    .then(() => {
       const pathToRSSFixture1 = getFixturePath('rss1_1.xml');
       const pathToRSSFixture2 = getFixturePath('rss2_1.xml');
 
@@ -186,12 +188,19 @@ test('Working process', () => {
         });
 
       return waitFor(() => {
-        const actualPostTitles = getAllByRole(elements.postsContainer, 'link')
-          .map((element) => element.textContent);
+        const postLinkELements = getAllByRole(elements.postsContainer, 'link');
+        const readPostLinkElements = postLinkELements.slice(-2);
+        const actualPostTitles = postLinkELements.map((element) => element.textContent);
+
         const expectedPostTitles = [
           'Blog post 3', 'Blog post 2', 'Урок 3',
           'Blog post 1', 'Урок 2', 'Урок 1',
         ];
+
+        readPostLinkElements.forEach((element) => {
+          expect(element).toHaveClass('font-weight-normal');
+          expect(element).not.toHaveClass('font-weight-bold');
+        });
 
         expect(actualPostTitles).toEqual(expectedPostTitles);
       });

@@ -118,6 +118,22 @@ const handleSubmit = (state, timeoutDelay) => {
     });
 };
 
+const clickHandlersByTagName = {
+  A: (postId, state) => {
+    state.readPostIds.add(postId);
+  },
+  BUTTON: (postId, state) => {
+    state.modalWindow.postId = postId;
+    state.readPostIds.add(postId);
+  },
+};
+
+const handleClick = (target, state) => {
+  const postId = target.dataset.id;
+  const handle = _.get(clickHandlersByTagName, target.tagName, _.noop);
+  handle(postId, state);
+};
+
 export default (timeoutDelay = defaultTimeoutDelay) => {
   const state = {
     form: {
@@ -128,6 +144,7 @@ export default (timeoutDelay = defaultTimeoutDelay) => {
     },
     feeds: [],
     posts: [],
+    readPostIds: new Set(),
     modalWindow: {
       postId: null,
     },
@@ -172,9 +189,7 @@ export default (timeoutDelay = defaultTimeoutDelay) => {
       });
 
       postsContainer.addEventListener('click', ({ target }) => {
-        if (target.tagName === 'BUTTON') {
-          watchedState.modalWindow.postId = target.dataset.id;
-        }
+        handleClick(target, watchedState);
       });
     });
 };

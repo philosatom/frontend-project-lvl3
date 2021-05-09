@@ -85,7 +85,7 @@ const renderFeeds = (feeds, { elements, i18n }) => {
   elements.feedsContainer.append(sectionTitleElement, listElement);
 };
 
-const renderPosts = (posts, { elements, i18n }) => {
+const renderPosts = (posts, { state, elements, i18n }) => {
   elements.postsContainer.innerHTML = '';
 
   const sectionTitleElement = document.createElement('h2');
@@ -104,7 +104,8 @@ const renderPosts = (posts, { elements, i18n }) => {
     );
 
     const linkElement = document.createElement('a');
-    linkElement.classList.add('font-weight-bold');
+    const isRead = state.readPostIds.has(post.id);
+    linkElement.classList.add(isRead ? 'font-weight-normal' : 'font-weight-bold');
     linkElement.setAttribute('href', post.link);
     linkElement.setAttribute('data-id', post.id);
     linkElement.setAttribute('target', '_blank');
@@ -128,6 +129,14 @@ const renderPosts = (posts, { elements, i18n }) => {
   elements.postsContainer.append(sectionTitleElement, listElement);
 };
 
+const renderReadPosts = (readPostIds, { elements }) => {
+  readPostIds.forEach((id) => {
+    const linkElement = elements.postsContainer.querySelector(`a[data-id="${id}"]`);
+    linkElement.classList.remove('font-weight-bold');
+    linkElement.classList.add('font-weight-normal');
+  });
+};
+
 const renderModalWindow = (postId, { state, elements }) => {
   const actualPost = state.posts.find((post) => post.id === postId);
 
@@ -142,6 +151,7 @@ const renderersByPath = {
   'form.error': renderError,
   feeds: renderFeeds,
   posts: renderPosts,
+  readPostIds: renderReadPosts,
   'modalWindow.postId': renderModalWindow,
 };
 
