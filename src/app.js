@@ -19,6 +19,8 @@ const routes = {
   getPath: (url) => `/get?url=${encodeURIComponent(url)}`,
 };
 
+const defaultTimeoutDelay = 5000;
+
 const schema = yup.string().url().uniqueness();
 
 const toObject = (data) => data.reduce((acc, { tagName, textContent }) => (
@@ -45,7 +47,33 @@ const handleInput = (field, { form }) => {
   form.data = field.value;
 };
 
-const handleSubmit = (state) => {
+const watchFeeds = (state, delay) => {
+  const promises = state.feeds.map((feed) => (
+    axios.get(routes.getPath(feed.url), { baseURL: routes.origin })
+      .then(({ data }) => {
+        const { items } = parseRSS(data.contents);
+        const newItems = _.differenceWith(items, state.posts, (item, post) => (
+          _.isEqual(item, _.omit(post, ['id', 'feedId']))
+        ));
+
+        return newItems.map((item) => (
+          { id: _.uniqueId(), feedId: feed.id, ...item }
+        ));
+      })
+      .catch(() => null)
+  ));
+
+  Promise.all(promises).then((values) => {
+    const newPosts = values
+      .filter((value) => value !== null)
+      .flat();
+
+    state.posts.unshift(...newPosts);
+    setTimeout(() => watchFeeds(state, delay), delay);
+  });
+};
+
+const handleSubmit = (state, timeoutDelay) => {
   state.form.error = null;
 
   const url = state.form.data.trim();
@@ -71,15 +99,18 @@ const handleSubmit = (state) => {
       state.form.data = '';
 
       const { items, ...feedData } = parseRSS(data.contents);
-      const feedId = _.uniqueId();
-      const newFeed = { id: feedId, url, ...feedData };
-      const newPosts = items.map((item) => {
-        const postId = _.uniqueId();
-        return { id: postId, feedId, ...item };
-      });
+      const newFeed = { id: _.uniqueId(), url, ...feedData };
+      const newPosts = items.map((item) => (
+        { id: _.uniqueId(), feedId: newFeed.id, ...item }
+      ));
 
       state.feeds.unshift(newFeed);
       state.posts.unshift(...newPosts);
+
+      if (!state.timer.isSet) {
+        state.timer.isSet = true;
+        setTimeout(() => watchFeeds(state, timeoutDelay), timeoutDelay);
+      }
     })
     .catch(() => {
       state.form.state = FORM_STATES.failed;
@@ -87,7 +118,7 @@ const handleSubmit = (state) => {
     });
 };
 
-export default () => {
+export default (timeoutDelay = defaultTimeoutDelay) => {
   const state = {
     form: {
       state: FORM_STATES.filling,
@@ -99,6 +130,9 @@ export default () => {
     posts: [],
     modalWindow: {
       postId: null,
+    },
+    timer: {
+      isSet: false,
     },
   };
 
@@ -134,7 +168,7 @@ export default () => {
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        handleSubmit(watchedState);
+        handleSubmit(watchedState, timeoutDelay);
       });
 
       postsContainer.addEventListener('click', ({ target }) => {

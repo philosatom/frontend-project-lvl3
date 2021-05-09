@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Ahmad Shadeed Blog</title>
+    <description>I’m Ahmad...</description>
+    <item>
+      <title>Blog post 3</title>
+      <link>http://ishadeed.com/article/practical-css-variables/</link>
+    </item>
+    <item>
+      <title>Blog post 2</title>
+      <link>http://ishadeed.com/article/say-hello-to-css-container-queries/</link>
+    </item>
+    <item>
+      <title>Blog post 1</title>
+      <link>http://ishadeed.com/article/inspect-element-curiosity/</link>
+    </item>
+  </channel>
+</rss>

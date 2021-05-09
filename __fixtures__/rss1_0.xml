@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Новые уроки на Хекслете</title>
+    <description>Практические уроки по программированию</description>
+    <item>
+      <title>Урок 2</title>
+      <link>https://ru.hexlet.io/courses/ruby-compound-data/lessons/points/theory_unit</link>
+      <description>Цель урока 2</description>
+    </item>
+    <item>
+      <title>Урок 1</title>
+      <link>https://ru.hexlet.io/courses/css-content/lessons/overflow/theory_unit</link>
+      <description>Цель урока 1</description>
+    </item>
+  </channel>
+</rss>

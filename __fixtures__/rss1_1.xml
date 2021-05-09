@@ -3,7 +3,11 @@
   <channel>
     <title>Новые уроки на Хекслете</title>
     <description>Практические уроки по программированию</description>
-    <link>https://ru.hexlet.io/</link>
+    <item>
+      <title>Урок 3</title>
+      <link>https://ru.hexlet.io/courses/python-setup-environment/lessons/poetry-and-packaging/theory_unit</link>
+      <description>Цель урока 3</description>
+    </item>
     <item>
       <title>Урок 2</title>
       <link>https://ru.hexlet.io/courses/ruby-compound-data/lessons/points/theory_unit</link>

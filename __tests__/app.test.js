@@ -19,7 +19,8 @@ const routes = {
   origin: 'https://hexlet-allorigins.herokuapp.com',
   invalidURLPath: 'invalid-url',
   nonRSSPath: 'https://google.com',
-  validPath: 'https://ru.hexlet.io/lessons.rss',
+  validPath1: 'https://ru.hexlet.io/lessons.rss',
+  validPath2: 'https://ishadeed.com/feed.xml',
 };
 
 const messages = {
@@ -29,6 +30,8 @@ const messages = {
   nonuniqueURL: 'RSS already exists',
 };
 
+const timeoutDelay = 0;
+
 axios.defaults.adapter = httpAdapter;
 nock.disableNetConnect();
 
@@ -36,7 +39,7 @@ let elements;
 
 beforeEach(() => {
   document.body.innerHTML = initHTML;
-  run();
+  run(timeoutDelay);
 
   elements = {
     urlInput: screen.getByRole('textbox', { name: /url/i }),
@@ -74,17 +77,17 @@ test('Working process', () => {
       });
     })
     .then(() => {
-      const pathToRSSFixture = getFixturePath('rss.xml');
+      const pathToRSSFixture = getFixturePath('rss1_0.xml');
 
       nock(routes.origin)
-        .get((uri) => uri.includes(encodeURIComponent(routes.validPath)))
+        .get((uri) => uri.includes(encodeURIComponent(routes.validPath1)))
         .reply(200, {
           contents: fs.readFileSync(pathToRSSFixture, 'utf-8'),
           status: { content_type: 'application/rss+xml; charset=utf-8' },
         });
 
       userEvent.clear(elements.urlInput);
-      userEvent.type(elements.urlInput, routes.validPath);
+      userEvent.type(elements.urlInput, routes.validPath1);
       userEvent.click(elements.addButton);
 
       return waitFor(() => {
@@ -94,6 +97,32 @@ test('Working process', () => {
         const actualPostTitles = getAllByRole(elements.postsContainer, 'link')
           .map((element) => element.textContent);
         const expectedPostTitles = ['Урок 2', 'Урок 1'];
+
+        expect(elements.feedback).toHaveTextContent(messages.success);
+        expect(actualfeedTitles).toEqual(expectedFeedTitles);
+        expect(actualPostTitles).toEqual(expectedPostTitles);
+      });
+    })
+    .then(() => {
+      const pathToRSSFixture = getFixturePath('rss2_0.xml');
+
+      nock(routes.origin)
+        .get((uri) => uri.includes(encodeURIComponent(routes.validPath2)))
+        .reply(200, {
+          contents: fs.readFileSync(pathToRSSFixture, 'utf-8'),
+          status: { content_type: 'application/xml' },
+        });
+
+      userEvent.type(elements.urlInput, routes.validPath2);
+      userEvent.click(elements.addButton);
+
+      return waitFor(() => {
+        const actualfeedTitles = getAllByRole(elements.feedsContainer, 'heading', { level: 3 })
+          .map((element) => element.textContent);
+        const expectedFeedTitles = ['Ahmad Shadeed Blog', 'Новые уроки на Хекслете'];
+        const actualPostTitles = getAllByRole(elements.postsContainer, 'link')
+          .map((element) => element.textContent);
+        const expectedPostTitles = ['Blog post 1', 'Урок 2', 'Урок 1'];
 
         expect(elements.feedback).toHaveTextContent(messages.success);
         expect(actualfeedTitles).toEqual(expectedFeedTitles);
@@ -118,6 +147,11 @@ test('Working process', () => {
 
       const expectedModalData = [
         {
+          title: 'Blog post 1',
+          description: '',
+          url: 'http://ishadeed.com/article/inspect-element-curiosity/',
+        },
+        {
           title: 'Урок 2',
           description: 'Цель урока 2',
           url: 'https://ru.hexlet.io/courses/ruby-compound-data/lessons/points/theory_unit',
@@ -134,7 +168,36 @@ test('Working process', () => {
       });
     })
     .then(() => {
-      userEvent.type(elements.urlInput, routes.validPath);
+      const pathToRSSFixture1 = getFixturePath('rss1_1.xml');
+      const pathToRSSFixture2 = getFixturePath('rss2_1.xml');
+
+      nock(routes.origin)
+        .get((uri) => uri.includes(encodeURIComponent(routes.validPath1)))
+        .reply(200, {
+          contents: fs.readFileSync(pathToRSSFixture1, 'utf-8'),
+          status: { content_type: 'application/rss+xml; charset=utf-8' },
+        });
+
+      nock(routes.origin)
+        .get((uri) => uri.includes(encodeURIComponent(routes.validPath2)))
+        .reply(200, {
+          contents: fs.readFileSync(pathToRSSFixture2, 'utf-8'),
+          status: { content_type: 'application/xml' },
+        });
+
+      return waitFor(() => {
+        const actualPostTitles = getAllByRole(elements.postsContainer, 'link')
+          .map((element) => element.textContent);
+        const expectedPostTitles = [
+          'Blog post 3', 'Blog post 2', 'Урок 3',
+          'Blog post 1', 'Урок 2', 'Урок 1',
+        ];
+
+        expect(actualPostTitles).toEqual(expectedPostTitles);
+      });
+    })
+    .then(() => {
+      userEvent.type(elements.urlInput, routes.validPath1);
       userEvent.click(elements.addButton);
 
       return waitFor(() => {
