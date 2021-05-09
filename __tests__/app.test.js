@@ -31,6 +31,7 @@ const messages = {
 };
 
 const timeoutDelay = 0;
+const language = 'en';
 
 axios.defaults.adapter = httpAdapter;
 nock.disableNetConnect();
@@ -39,7 +40,7 @@ let elements;
 
 beforeEach(() => {
   document.body.innerHTML = initHTML;
-  run(timeoutDelay);
+  run(language, timeoutDelay);
 
   elements = {
     urlInput: screen.getByRole('textbox', { name: /url/i }),

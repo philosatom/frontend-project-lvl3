@@ -20,6 +20,7 @@ const routes = {
 };
 
 const defaultTimeoutDelay = 5000;
+const defaultLanguage = 'ru';
 
 const schema = yup.string().url().uniqueness();
 
@@ -134,7 +135,7 @@ const handleClick = (target, state) => {
   handle(postId, state);
 };
 
-export default (timeoutDelay = defaultTimeoutDelay) => {
+export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) => {
   const state = {
     form: {
       state: FORM_STATES.filling,
@@ -175,7 +176,7 @@ export default (timeoutDelay = defaultTimeoutDelay) => {
     modalWindowLink,
   };
 
-  i18n.init({ lng: 'en', resources })
+  i18n.init({ lng: language, resources })
     .then(() => {
       const watchedState = initView(state, elements, i18n);
 
