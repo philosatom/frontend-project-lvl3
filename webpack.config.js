@@ -5,7 +5,7 @@ module.exports = {
   mode: process.env.NODE_ENV || 'development',
   plugins: [
     new HTMLWebpackPlugin({
-      template: 'src/index.html',
+      template: './index.html',
     }),
     new MiniCssExtractPlugin(),
   ],
