@@ -89,6 +89,12 @@ const handleSubmit = (state, timeoutDelay) => {
   }
 
   axios.get(routes.getPath(url), { baseURL: routes.origin })
+    .catch((error) => {
+      state.form.state = FORM_STATES.failed;
+      state.form.error = 'form.messages.errors.network';
+
+      throw error;
+    })
     .then(({ data }) => {
       if (!/(rss|xml)/.test(data.status.content_type)) {
         state.form.state = FORM_STATES.failed;
@@ -112,10 +118,6 @@ const handleSubmit = (state, timeoutDelay) => {
         state.timer.isSet = true;
         setTimeout(() => watchFeeds(state, timeoutDelay), timeoutDelay);
       }
-    })
-    .catch(() => {
-      state.form.state = FORM_STATES.failed;
-      state.form.error = 'form.messages.errors.network';
     });
 };
 
