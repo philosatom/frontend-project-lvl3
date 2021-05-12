@@ -63,10 +63,12 @@ test('Working process', () => {
     expect(elements.feedback).toHaveTextContent(messages.invalidURL);
   })
     .then(() => {
+      const pathToNonRSSFixture = getFixturePath('nonRSS.html');
+
       nock(routes.origin)
         .get((uri) => uri.includes(encodeURIComponent(routes.nonRSSPath)))
         .reply(200, {
-          status: { content_type: 'text/html; charset=utf-8' },
+          contents: fs.readFileSync(pathToNonRSSFixture, 'utf-8'),
         });
 
       userEvent.clear(elements.urlInput);
@@ -84,7 +86,6 @@ test('Working process', () => {
         .get((uri) => uri.includes(encodeURIComponent(routes.validPath1)))
         .reply(200, {
           contents: fs.readFileSync(pathToRSSFixture, 'utf-8'),
-          status: { content_type: 'application/rss+xml; charset=utf-8' },
         });
 
       userEvent.clear(elements.urlInput);
@@ -151,7 +152,6 @@ test('Working process', () => {
         .get((uri) => uri.includes(encodeURIComponent(routes.validPath2)))
         .reply(200, {
           contents: fs.readFileSync(pathToRSSFixture, 'utf-8'),
-          status: { content_type: 'application/xml' },
         });
 
       userEvent.type(elements.urlInput, routes.validPath2);
@@ -178,14 +178,12 @@ test('Working process', () => {
         .get((uri) => uri.includes(encodeURIComponent(routes.validPath1)))
         .reply(200, {
           contents: fs.readFileSync(pathToRSSFixture1, 'utf-8'),
-          status: { content_type: 'application/rss+xml; charset=utf-8' },
         });
 
       nock(routes.origin)
         .get((uri) => uri.includes(encodeURIComponent(routes.validPath2)))
         .reply(200, {
           contents: fs.readFileSync(pathToRSSFixture2, 'utf-8'),
-          status: { content_type: 'application/xml' },
         });
 
       return waitFor(() => {

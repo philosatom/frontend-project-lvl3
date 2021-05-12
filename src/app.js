@@ -89,24 +89,7 @@ const handleSubmit = (state, timeoutDelay) => {
   }
 
   axios.get(routes.getPath(url), { baseURL: routes.origin })
-    .catch((error) => {
-      state.form.state = FORM_STATES.failed;
-      state.form.error = 'form.messages.errors.network';
-
-      throw error;
-    })
     .then(({ data }) => {
-      console.log(data);
-
-      if (!/(rss|xml)/.test(data.status.content_type)) {
-        state.form.state = FORM_STATES.failed;
-        state.form.error = 'form.messages.errors.rss';
-        return;
-      }
-
-      state.form.state = FORM_STATES.processed;
-      state.form.data = '';
-
       const { items, ...feedData } = parseRSS(data.contents);
       const newFeed = { id: _.uniqueId(), url, ...feedData };
       const newPosts = items.map((item) => (
@@ -116,10 +99,19 @@ const handleSubmit = (state, timeoutDelay) => {
       state.feeds.unshift(newFeed);
       state.posts.unshift(...newPosts);
 
+      state.form.state = FORM_STATES.processed;
+      state.form.data = '';
+
       if (!state.timer.isSet) {
         state.timer.isSet = true;
         setTimeout(() => watchFeeds(state, timeoutDelay), timeoutDelay);
       }
+    })
+    .catch((error) => {
+      state.form.state = FORM_STATES.failed;
+
+      const errorType = error.isAxiosError ? 'network' : 'rss';
+      state.form.error = `form.messages.errors.${errorType}`;
     });
 };
 
