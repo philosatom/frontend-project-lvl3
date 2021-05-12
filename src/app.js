@@ -96,6 +96,8 @@ const handleSubmit = (state, timeoutDelay) => {
       throw error;
     })
     .then(({ data }) => {
+      console.log(data);
+
       if (!/(rss|xml)/.test(data.status.content_type)) {
         state.form.state = FORM_STATES.failed;
         state.form.error = 'form.messages.errors.rss';
