@@ -6,7 +6,7 @@ import onChange from 'on-change';
 const renderProcessingState = (elements) => {
   elements.submitButton.disabled = true;
 
-  elements.urlField.disabled = true;
+  elements.urlField.setAttribute('readonly', '');
 
   elements.feedbackElement.className = 'feedback';
   elements.feedbackElement.textContent = '';
@@ -15,7 +15,7 @@ const renderProcessingState = (elements) => {
 const renderProcessedState = (elements, i18n) => {
   elements.submitButton.disabled = false;
 
-  elements.urlField.disabled = false;
+  elements.urlField.removeAttribute('readonly');
   elements.urlField.value = '';
   elements.urlField.focus();
 
@@ -25,7 +25,7 @@ const renderProcessedState = (elements, i18n) => {
 
 const renderFailedState = (elements) => {
   elements.submitButton.disabled = false;
-  elements.urlField.disabled = false;
+  elements.urlField.removeAttribute('readonly');
 };
 
 const renderersByFormState = {
