@@ -3,7 +3,7 @@
 import axios from 'axios';
 import i18n from 'i18next';
 import _ from 'lodash';
-import getValidationError, { yup } from './validator.js';
+import getValidator from './validator.js';
 import resources from './locales';
 import initView from './view.js';
 
@@ -21,8 +21,6 @@ const routes = {
 
 const defaultTimeoutDelay = 5000;
 const defaultLanguage = 'ru';
-
-const schema = yup.string().url().uniqueness();
 
 const toObject = (data) => data.reduce((acc, { tagName, textContent }) => (
   { ...acc, [tagName]: textContent }
@@ -74,13 +72,13 @@ const watchFeeds = (state, delay) => {
   });
 };
 
-const handleSubmit = (state, timeoutDelay) => {
+const handleSubmit = (state, getValidationError, timeoutDelay) => {
   state.form.error = null;
 
   const url = state.form.data.trim();
 
   state.form.state = FORM_STATES.processing;
-  state.form.error = getValidationError(url, schema, state);
+  state.form.error = getValidationError(url);
   state.form.isValid = state.form.error === null;
 
   if (!state.form.isValid) {
@@ -175,6 +173,7 @@ export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) 
   i18n.init({ lng: language, resources })
     .then(() => {
       const watchedState = initView(state, elements, i18n);
+      const getValidationError = getValidator(watchedState);
 
       urlField.addEventListener('input', () => {
         handleInput(urlField, watchedState);
@@ -182,7 +181,7 @@ export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) 
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        handleSubmit(watchedState, timeoutDelay);
+        handleSubmit(watchedState, getValidationError, timeoutDelay);
       });
 
       postsContainer.addEventListener('click', ({ target }) => {

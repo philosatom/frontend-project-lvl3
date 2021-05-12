@@ -1,23 +1,21 @@
 import * as yup from 'yup';
 
-yup.addMethod(yup.mixed, 'uniqueness', function validate() {
-  return this.test({
-    name: 'uniqueness',
-    test(value) {
-      const { feeds } = this.options.context;
+export default ({ feeds }) => {
+  const schema = yup.string().url().test(
+    'uniqueness',
+    'this must be a unique URL',
+    (value, context) => {
       const isUnique = feeds.every(({ url }) => url !== value);
-      return isUnique || this.createError();
+      return isUnique || context.createError();
     },
-  });
-});
+  );
 
-export { yup };
-
-export default (value, schema, state) => {
-  try {
-    schema.validateSync(value, { abortEarly: false, context: state });
-    return null;
-  } catch ({ inner: [{ type }] }) {
-    return `form.messages.errors.validation.${type}`;
-  }
+  return (value) => {
+    try {
+      schema.validateSync(value, { abortEarly: false });
+      return null;
+    } catch ({ inner: [{ type }] }) {
+      return `form.messages.errors.validation.${type}`;
+    }
+  };
 };
