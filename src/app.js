@@ -16,7 +16,7 @@ const FORM_STATES = {
 
 const routes = {
   origin: 'https://hexlet-allorigins.herokuapp.com',
-  getPath: (url) => `/get?url=${encodeURIComponent(url)}`,
+  getPath: (url) => `/get?disableCache=true&url=${encodeURIComponent(url)}`,
 };
 
 const defaultTimeoutDelay = 5000;
