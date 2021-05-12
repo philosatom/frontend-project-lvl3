@@ -6,10 +6,13 @@ env:
 extends:
   - airbnb-base
   - plugin:jest/recommended
+  - plugin:functional/external-recommended
+  - plugin:functional/recommended
 
 plugins:
   - jest
   - '@babel'
+  - functional
 
 parser:
   '@babel/eslint-parser'
@@ -20,8 +23,10 @@ parserOptions:
 rules:
   no-console: 0
   import/extensions: 0
-  no-underscore-dangle:
-    - error
-    - allow:
-        - __filename
-        - __dirname
+  functional/no-conditional-statement: 0
+  functional/no-expression-statement: 0
+  functional/immutable-data: 0
+  functional/functional-parameters: 0
+  functional/no-try-statement: 0
+  functional/no-throw-statement: 0
+  no-param-reassign: 0

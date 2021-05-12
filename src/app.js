@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-
 import axios from 'axios';
 import i18n from 'i18next';
 import _ from 'lodash';

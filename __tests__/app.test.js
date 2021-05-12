@@ -36,7 +36,7 @@ const language = 'en';
 axios.defaults.adapter = httpAdapter;
 nock.disableNetConnect();
 
-let elements;
+let elements; // eslint-disable-line functional/no-let
 
 beforeEach(() => {
   document.body.innerHTML = initHTML;
