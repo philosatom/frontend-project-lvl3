@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/prefer-screen-queries */
+
 import '@testing-library/jest-dom';
 import { screen, getAllByRole, waitFor } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';

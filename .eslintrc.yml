@@ -6,6 +6,8 @@ env:
 extends:
   - airbnb-base
   - plugin:jest/recommended
+  - plugin:jest-dom/recommended
+  - plugin:testing-library/react
   - plugin:functional/external-recommended
   - plugin:functional/recommended
 
@@ -13,6 +15,8 @@ plugins:
   - jest
   - '@babel'
   - functional
+  - testing-library
+  - jest-dom
 
 parser:
   '@babel/eslint-parser'
