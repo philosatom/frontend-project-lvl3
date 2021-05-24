@@ -30,8 +30,10 @@ const messages = {
   nonuniqueURL: 'RSS already exists',
 };
 
-const timeoutDelay = 0;
-const language = 'en';
+const options = {
+  language: 'en',
+  timeoutDelay: 0,
+};
 
 axios.defaults.adapter = httpAdapter;
 nock.disableNetConnect();
@@ -40,7 +42,7 @@ let elements; // eslint-disable-line functional/no-let
 
 beforeEach(() => {
   document.body.innerHTML = initHTML;
-  run(language, timeoutDelay);
+  run(options);
 
   elements = {
     urlInput: screen.getByRole('textbox', { name: /url/i }),

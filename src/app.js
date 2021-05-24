@@ -1,9 +1,15 @@
 import axios from 'axios';
 import i18n from 'i18next';
 import _ from 'lodash';
-import getValidator from './validator.js';
 import resources from './locales';
 import initView from './view.js';
+import getValidator from './validator.js';
+import parseRSS from './parser.js';
+
+const defaultOptions = {
+  language: 'ru',
+  timeoutDelay: 5000,
+};
 
 const FORM_STATES = {
   filling: 'filling',
@@ -12,41 +18,18 @@ const FORM_STATES = {
   failed: 'failed',
 };
 
-const routes = {
-  origin: 'https://hexlet-allorigins.herokuapp.com',
-  getPath: (url) => `/get?disableCache=true&url=${encodeURIComponent(url)}`,
-};
+const getProxiedURL = (url) => {
+  const proxiedURL = new URL('/get', 'https://hexlet-allorigins.herokuapp.com');
 
-const defaultTimeoutDelay = 5000;
-const defaultLanguage = 'ru';
+  proxiedURL.searchParams.set('url', url);
+  proxiedURL.searchParams.set('disableCache', 'true');
 
-const toObject = (data) => data.reduce((acc, { tagName, textContent }) => (
-  { ...acc, [tagName]: textContent }
-), {});
-
-const parseRSS = (rss) => {
-  const parser = new DOMParser();
-  const xmlDocument = parser.parseFromString(rss, 'text/xml');
-  const channel = xmlDocument.querySelector('channel');
-
-  const [itemElements, feedDataElements] = _.partition(
-    [...channel.children],
-    ({ tagName }) => tagName === 'item',
-  );
-
-  const feedData = toObject(feedDataElements);
-  const items = itemElements.map(({ children }) => toObject([...children]));
-  return { ...feedData, items };
-};
-
-const handleInput = (field, { form }) => {
-  form.state = FORM_STATES.filling;
-  form.data = field.value;
+  return proxiedURL.toString();
 };
 
 const watchFeeds = (state, delay) => {
   const promises = state.feeds.map((feed) => (
-    axios.get(routes.getPath(feed.url), { baseURL: routes.origin })
+    axios.get(getProxiedURL(feed.url))
       .then(({ data }) => {
         const { items } = parseRSS(data.contents);
         const newItems = _.differenceWith(items, state.posts, (item, post) => (
@@ -70,7 +53,17 @@ const watchFeeds = (state, delay) => {
   });
 };
 
-const handleSubmit = (state, getValidationError, timeoutDelay) => {
+const handleInput = (field, { form }) => {
+  form.state = FORM_STATES.filling;
+  form.data = field.value;
+};
+
+const errorTypes = {
+  'Network Error': 'network',
+  'RSS Error': 'rss',
+};
+
+const handleSubmit = (state, getValidationError) => {
   state.form.error = null;
 
   const url = state.form.data.trim();
@@ -84,7 +77,7 @@ const handleSubmit = (state, getValidationError, timeoutDelay) => {
     return;
   }
 
-  axios.get(routes.getPath(url), { baseURL: routes.origin })
+  axios.get(getProxiedURL(url))
     .then(({ data }) => {
       const { items, ...feedData } = parseRSS(data.contents);
       const newFeed = { id: _.uniqueId(), url, ...feedData };
@@ -97,16 +90,11 @@ const handleSubmit = (state, getValidationError, timeoutDelay) => {
 
       state.form.state = FORM_STATES.processed;
       state.form.data = '';
-
-      if (!state.timer.isSet) {
-        state.timer.isSet = true;
-        setTimeout(() => watchFeeds(state, timeoutDelay), timeoutDelay);
-      }
     })
     .catch((error) => {
       state.form.state = FORM_STATES.failed;
 
-      const errorType = error.isAxiosError ? 'network' : 'rss';
+      const errorType = errorTypes[error.message] ?? 'unknown';
       state.form.error = `form.messages.errors.${errorType}`;
     });
 };
@@ -123,11 +111,11 @@ const clickHandlersByTagName = {
 
 const handleClick = (target, state) => {
   const postId = target.dataset.id;
-  const handle = _.get(clickHandlersByTagName, target.tagName, _.noop);
+  const handle = clickHandlersByTagName[target.tagName] ?? _.noop;
   handle(postId, state);
 };
 
-export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) => {
+export default ({ language, timeoutDelay } = defaultOptions) => {
   const state = {
     form: {
       state: FORM_STATES.filling,
@@ -140,9 +128,6 @@ export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) 
     readPostIds: new Set(),
     modalWindow: {
       postId: null,
-    },
-    timer: {
-      isSet: false,
     },
   };
 
@@ -168,7 +153,7 @@ export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) 
     modalWindowLink,
   };
 
-  i18n.init({ lng: language, resources })
+  return i18n.init({ lng: language, resources })
     .then(() => {
       const watchedState = initView(state, elements, i18n);
       const getValidationError = getValidator(watchedState);
@@ -179,11 +164,13 @@ export default (language = defaultLanguage, timeoutDelay = defaultTimeoutDelay) 
 
       form.addEventListener('submit', (event) => {
         event.preventDefault();
-        handleSubmit(watchedState, getValidationError, timeoutDelay);
+        handleSubmit(watchedState, getValidationError);
       });
 
       postsContainer.addEventListener('click', ({ target }) => {
         handleClick(target, watchedState);
       });
+
+      setTimeout(() => watchFeeds(watchedState, timeoutDelay), timeoutDelay);
     });
 };

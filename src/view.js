@@ -33,7 +33,7 @@ const renderersByFormState = {
 };
 
 const renderFormState = (state, { elements, i18n }) => {
-  const render = _.get(renderersByFormState, state, _.noop);
+  const render = renderersByFormState[state] ?? _.noop;
   render(elements, i18n);
 };
 
@@ -155,7 +155,7 @@ const renderersByPath = {
 
 export default (state, elements, i18n) => {
   const watchedState = onChange(state, (path, value) => {
-    const render = _.get(renderersByPath, path, _.noop);
+    const render = renderersByPath[path] ?? _.noop;
     render(value, { state: watchedState, elements, i18n });
   });
 

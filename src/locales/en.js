@@ -9,6 +9,7 @@ export default {
           },
           rss: 'Resource does not contain a valid RSS',
           network: 'Network error',
+          unknown: 'Unknown error',
         },
         success: 'RSS was loaded successfully',
       },
