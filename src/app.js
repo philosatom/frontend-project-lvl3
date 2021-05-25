@@ -1,4 +1,3 @@
-import 'bootstrap/js/dist/modal';
 import axios from 'axios';
 import i18n from 'i18next';
 import _ from 'lodash';
@@ -6,6 +5,7 @@ import resources from './locales';
 import initView from './view.js';
 import getValidator from './validator.js';
 import parseRSS from './parser.js';
+import 'bootstrap/js/dist/modal';
 
 const defaultOptions = {
   language: 'ru',

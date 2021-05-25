@@ -110,6 +110,14 @@ test('Working process', () => {
       });
     })
     .then(() => {
+      userEvent.type(elements.urlInput, routes.validPath1);
+      userEvent.click(elements.addButton);
+
+      return waitFor(() => {
+        expect(elements.feedback).toHaveTextContent(messages.nonuniqueURL);
+      });
+    })
+    .then(() => {
       const buttons = getAllByRole(elements.postsContainer, 'button');
       const actualModalData = [];
 
@@ -206,14 +214,6 @@ test('Working process', () => {
         });
 
         expect(actualPostTitles).toEqual(expectedPostTitles);
-      });
-    })
-    .then(() => {
-      userEvent.type(elements.urlInput, routes.validPath1);
-      userEvent.click(elements.addButton);
-
-      return waitFor(() => {
-        expect(elements.feedback).toHaveTextContent(messages.nonuniqueURL);
       });
     });
 });
