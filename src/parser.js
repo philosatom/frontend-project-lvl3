@@ -1,12 +1,4 @@
-/* eslint-disable functional/no-class, class-methods-use-this */
-
 import _ from 'lodash';
-
-class RSSParserError extends Error {
-  isRSSParserError() {
-    return true;
-  }
-}
 
 const toObject = (data) => data.reduce((acc, { tagName, textContent }) => (
   { ...acc, [tagName]: textContent }
@@ -27,6 +19,8 @@ export default (rss) => {
     const items = itemElements.map(({ children }) => toObject([...children]));
     return { ...feedData, items };
   } catch {
-    throw new RSSParserError('Unable to parse content');
+    const error = new Error('Unable to parse content');
+    error.isRSSParserError = true;
+    throw error;
   }
 };
