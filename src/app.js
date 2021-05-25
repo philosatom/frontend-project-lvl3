@@ -11,7 +11,7 @@ const defaultOptions = {
   timeoutDelay: 5000,
 };
 
-const FORM_STATES = {
+const formStates = {
   filling: 'filling',
   processing: 'processing',
   processed: 'processed',
@@ -54,13 +54,14 @@ const watchFeeds = (state, delay) => {
 };
 
 const handleInput = (field, { form }) => {
-  form.state = FORM_STATES.filling;
+  form.state = formStates.filling;
   form.data = field.value;
 };
 
-const errorTypes = {
-  'Network Error': 'network',
-  'RSS Error': 'rss',
+const getErrorType = (error) => {
+  if (error.isAxiosError) return 'network';
+  if (error.isRSSParserError) return 'rss';
+  return 'unknown';
 };
 
 const handleSubmit = (state, getValidationError) => {
@@ -68,12 +69,12 @@ const handleSubmit = (state, getValidationError) => {
 
   const url = state.form.data.trim();
 
-  state.form.state = FORM_STATES.processing;
+  state.form.state = formStates.processing;
   state.form.error = getValidationError(url);
   state.form.isValid = state.form.error === null;
 
   if (!state.form.isValid) {
-    state.form.state = FORM_STATES.failed;
+    state.form.state = formStates.failed;
     return;
   }
 
@@ -88,13 +89,13 @@ const handleSubmit = (state, getValidationError) => {
       state.feeds.unshift(newFeed);
       state.posts.unshift(...newPosts);
 
-      state.form.state = FORM_STATES.processed;
+      state.form.state = formStates.processed;
       state.form.data = '';
     })
     .catch((error) => {
-      state.form.state = FORM_STATES.failed;
+      state.form.state = formStates.failed;
 
-      const errorType = errorTypes[error.message] ?? 'unknown';
+      const errorType = getErrorType(error);
       state.form.error = `form.messages.errors.${errorType}`;
     });
 };
@@ -118,7 +119,7 @@ const handleClick = (target, state) => {
 export default ({ language, timeoutDelay } = defaultOptions) => {
   const state = {
     form: {
-      state: FORM_STATES.filling,
+      state: formStates.filling,
       data: '',
       isValid: true,
       error: null,
